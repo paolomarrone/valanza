@@ -1,16 +1,20 @@
-#!/bin/bash
+#!/bin/awk -f
 
-col=${1:-1}
+BEGIN {
+	if (col == "") {
+		col = 2
+	}
+}
 
-awk -v column="$col" '\
 {
-	sum += $column
+	sum += $col
 	count++
 }
+
 END {
 	if (count > 0) {
 		print sum / count
 	} else {
 		print 0
 	}
-}'
+}
