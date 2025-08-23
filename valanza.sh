@@ -11,13 +11,14 @@ if [ ! -f "$DATA_FILE" ]; then
 	exit 1
 fi
 
-# Calculate mean of last N days
-mean=$(tail -n "$DAYS" "$DATA_FILE" | awk '{sum += $2; count++} END {if (count > 0) print sum/count; else print 0}')
-
-# Print all entries and the mean
-echo "Last $DAYS entries:"
-tail -n "$DAYS" "$DATA_FILE"
-echo "Mean weight (last $DAYS days): $mean"
-
-
-cat "$DATA_FILE" | ./interpolate_lin.R | gnuplot -persist "$PLOT_FILE"
+gnuplot -persist << EOF
+	set xdata time
+	set timefmt "%Y-%m-%d"
+	set format x "%Y-%m-%d"
+	set xlabel "Date"
+	set ylabel "Weight (kg)"
+	set grid
+	plot '<cat "$DATA_FILE" | ./interpolate_lin.R'                 using 1:2 with lines title "Raw Data", \
+		 '<cat "$DATA_FILE" | ./interpolate_lin.R | ./mov_avg.awk' using 1:2 with lines title "7-Day Moving Average", \
+		 '<cat "$DATA_FILE" | ./interpolate_lin.R | ./lp1.awk'     using 1:2 with lines title "Low-Pass Filter"
+EOF
