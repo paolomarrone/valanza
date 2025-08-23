@@ -1,8 +1,10 @@
 #!/usr/bin/env Rscript
 
-library(dplyr)
-library(tidyr)
-library(zoo)
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(tidyr)
+  library(zoo)
+})
 
 # Read input from stdin or a file
 args <- commandArgs(trailingOnly = TRUE)

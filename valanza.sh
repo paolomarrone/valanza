@@ -20,4 +20,4 @@ tail -n "$DAYS" "$DATA_FILE"
 echo "Mean weight (last $DAYS days): $mean"
 
 
-cat "$DATA_FILE" | gnuplot -persist "$PLOT_FILE"
+cat "$DATA_FILE" | ./interpolate_lin.R | gnuplot -persist "$PLOT_FILE"
