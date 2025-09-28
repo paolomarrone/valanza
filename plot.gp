@@ -3,4 +3,7 @@ set timefmt "%Y-%m-%d"
 set format x "%Y-%m-%d"
 set xlabel "Date"
 set ylabel "Weight (kg)"
-plot '<cat' using 1:2 with linespoints pointtype 7 title "Weight"
+set grid
+plot datafile using 1:2 with lines title "Raw Data", \
+     datafile using 1:3 with lines title "7-Day Moving Average", \
+     datafile using 1:4 with lines title "Low-Pass Filter"

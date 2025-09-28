@@ -38,7 +38,7 @@ BEGIN {
 	# calculate and print the moving average.
 	if ((tail - head) == current_win) {
 		# The moving average is the current_sum divided by the window size.
-		print $1 " " current_sum / current_win
+		print current_sum / current_win
 	}
 	if (current_win < win) {
 		current_win++;
