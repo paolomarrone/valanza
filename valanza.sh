@@ -11,12 +11,18 @@ fi
 RAM_DIR="/dev/shm/$(basename "$0")_$$"  # Use script name + PID for uniqueness
 mkdir -p "$RAM_DIR"
 
-cat "$DATA_FILE" | ./interpolate_lin.R | tee \
-	$RAM_DIR/raw.txt \
-	>(./mov_avg.awk > $RAM_DIR/mov.txt) \
-	>(./lp1.awk > $RAM_DIR/lp1.txt) \
-	> /dev/null
+mkfifo $RAM_DIR/raw $RAM_DIR/avg $RAM_DIR/lp1
 
-paste -d " " $RAM_DIR/raw.txt $RAM_DIR/mov.txt $RAM_DIR/lp1.txt > $RAM_DIR/all.txt
+cat "$DATA_FILE" | ./interpolate_lin.R | tee \
+	$RAM_DIR/raw \
+	>(./mov_avg.awk > $RAM_DIR/avg) \
+	>(./lp1.awk > $RAM_DIR/lp1) \
+	> /dev/null &
+
+paste -d " " \
+	<(cat $RAM_DIR/raw) \
+	<(cat $RAM_DIR/avg) \
+	<(cat $RAM_DIR/lp1) \
+	> $RAM_DIR/all.txt
 
 gnuplot -e "datafile='$RAM_DIR/all.txt'" -persist $PLOT_FILE
