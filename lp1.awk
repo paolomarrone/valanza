@@ -3,7 +3,9 @@
 # row: date num
 
 BEGIN {
-	col = 2
+	if (col == "") {
+		col = 1
+	}
 	getline
 	y = $2
 	print $2

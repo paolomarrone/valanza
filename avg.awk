@@ -2,7 +2,7 @@
 
 BEGIN {
 	if (col == "") {
-		col = 2
+		col = 1
 	}
 }
 
