@@ -1,12 +1,8 @@
 #!/bin/awk -f
 
 BEGIN {
-	if (col == "") {
-		col = 1
-	}
-	if (win == "") {
-		win = 7
-	}
+	col = col ? col : 1
+	win = win ? win : 7
 
 	head = 1
 	tail = 1

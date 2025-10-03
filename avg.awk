@@ -1,9 +1,7 @@
 #!/bin/awk -f
 
 BEGIN {
-	if (col == "") {
-		col = 1
-	}
+	col = col ? col : 1
 }
 
 {

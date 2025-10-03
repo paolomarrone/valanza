@@ -1,17 +1,14 @@
 #!/bin/awk -f
 
-# row: date num
-
 BEGIN {
-	if (col == "") {
-		col = 1
-	}
+	col = col ? col : 1
+
 	getline
-	y = $2
-	print $2
+	y = $col
+	print $col
 }
 
 {
-	y = y * 0.9 + $2 * 0.1
+	y = y * 0.9 + $col * 0.1
 	print y
 }
