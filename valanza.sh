@@ -10,6 +10,7 @@ fi
 
 RAM_DIR="/dev/shm/$(basename "$0")_$$"
 mkdir -p "$RAM_DIR"
+trap 'rm -rf -- "$RAM_DIR"' EXIT
 
 mkfifo $RAM_DIR/dates $RAM_DIR/int $RAM_DIR/avg $RAM_DIR/lp1
 
