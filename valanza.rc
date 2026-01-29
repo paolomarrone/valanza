@@ -1,4 +1,4 @@
-#!/bin/rc
+#!/usr/bin/env rc
 
 if(~ $#* 0) {
 	echo 'Error: DATA_FILE not provided.'
@@ -12,14 +12,16 @@ if(! test -f $DATA_FILE) {
 	exit 'file not found'
 }
 
-RAM_DIR = /dev/shm/`{basename $0}^$pid
+RAM_DIR = /tmp/`{basename $0}^$pid
+if(test -d /dev/shm) {
+	RAM_DIR = /dev/shm/`{basename $0}^$pid
+}
 
 mkdir -p $RAM_DIR
 
 fn cleanup {
 	rm -rf -- $RAM_DIR
 }
-
 
 mkfifo $RAM_DIR/^(dates int avg lp1)
 
