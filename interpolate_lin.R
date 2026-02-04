@@ -1,11 +1,5 @@
 #!/usr/bin/env Rscript
 
-suppressPackageStartupMessages({
-  library(dplyr)
-  library(tidyr)
-  library(zoo)
-})
-
 # Read input from stdin or a file
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 0) {
@@ -26,18 +20,27 @@ all_dates <- seq(min(data$Date), max(data$Date), by = "day")
 all_data <- data.frame(Date = all_dates)
 
 # Merge with original data to fill missing dates
-merged_data <- all_data %>% 
-	left_join(data, by = "Date")
+merged_data <- merge(all_data, data, by = "Date", all.x = TRUE)
 
 # Interpolate numeric columns using linear interpolation
 numeric_cols <- names(data)[2:ncol(data)]
 for (col in numeric_cols) {
-	merged_data[[col]] <- round(na.approx(merged_data[[col]], na.rm = FALSE), digits = 1)
+	merged_data[[col]] <- round(approx(seq_along(merged_data[[col]]), merged_data[[col]], 
+	                                   xout = seq_along(merged_data[[col]]), 
+	                                   method = "linear")$y, digits = 1)
 }
 
-# Replace NA with previous values for non-numeric columns (if any)
-# (Assuming all columns except Date are numeric in this case)
-merged_data <- merged_data %>% fill(all_of(numeric_cols), .direction = "down")
+# Replace remaining NAs with previous values (forward fill)
+for (col in numeric_cols) {
+	na_idx <- which(is.na(merged_data[[col]]))
+	if (length(na_idx) > 0) {
+		for (i in na_idx) {
+			if (i > 1) {
+				merged_data[[col]][i] <- merged_data[[col]][i - 1]
+			}
+		}
+	}
+}
 
 # Print output in the same format (space-separated, no quotes)
 write.table(merged_data, file = "", sep = " ", row.names = FALSE, col.names = FALSE, quote = FALSE)

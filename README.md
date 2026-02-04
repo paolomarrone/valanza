@@ -18,11 +18,6 @@ This might evolve into a UNIX-style calc alternative how-to.
 - gnuplot
 - rc (optional)
 
-**R package installation:**
-```bash
-Rscript -e 'install.packages(c("dplyr", "tidyr", "zoo"), repos="https://cran.r-project.org")'
-```
-
 ## Usage
 
 ```bash
