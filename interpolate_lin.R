@@ -27,7 +27,7 @@ numeric_cols <- names(data)[2:ncol(data)]
 for (col in numeric_cols) {
 	merged_data[[col]] <- round(approx(seq_along(merged_data[[col]]), merged_data[[col]], 
 	                                   xout = seq_along(merged_data[[col]]), 
-	                                   method = "linear")$y, digits = 1)
+	                                   method = "linear")$y, digits = 2)
 }
 
 # Replace remaining NAs with previous values (forward fill)
