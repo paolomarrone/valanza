@@ -5,11 +5,22 @@ if(~ $#* 0) {
 	exit 'missing argument'
 }
 DATA_FILE = $1
+DAYS = ''
+if(! ~ $#* 1) {
+	DAYS = $2
+}
 PLOT_FILE = 'plot.gp'
 
 if(! test -f $DATA_FILE) {
 	echo 'Error:' $DATA_FILE 'not found'
 	exit 'file not found'
+}
+
+if(! ~ $DAYS '') {
+	if(! ~ $DAYS [1-9][0-9]*) {
+		echo 'Error: DAYS must be a positive integer'
+		exit 'invalid DAYS'
+	}
 }
 
 RAM_DIR = /tmp/`{basename $0}^$pid
@@ -25,12 +36,18 @@ fn cleanup {
 
 mkfifo $RAM_DIR/^(dates int avg lp1)
 
-cat $DATA_FILE | ./interpolate_lin.R | tee \
-	>{cut -d' ' -f1                        > $RAM_DIR/dates} \
-	>{cut -d' ' -f2                        > $RAM_DIR/int} \
-	>{./mov_avg.awk -v 'col=2' -v 'win=11' > $RAM_DIR/avg} \
-	>{./lp1.awk     -v 'col=2'             > $RAM_DIR/lp1} \
-	> /dev/null &
+cat $DATA_FILE \
+	| ./interpolate_lin.R \
+	| {
+		if(! ~ $DAYS '') tail -n $DAYS
+		if(~ $DAYS '') cat
+	  } \
+	| tee \
+		>{cut -d' ' -f1                        > $RAM_DIR/dates} \
+		>{cut -d' ' -f2                        > $RAM_DIR/int} \
+		>{./mov_avg.awk -v 'col=2' -v 'win=11' > $RAM_DIR/avg} \
+		>{./lp1.awk     -v 'col=2'             > $RAM_DIR/lp1} \
+		> /dev/null &
 
 paste -d ' ' \
 	<{cat $RAM_DIR/dates} \

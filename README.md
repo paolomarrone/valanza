@@ -24,10 +24,20 @@ This might evolve into a UNIX-style calc alternative how-to.
 ./valanza.sh weight.txt
 ```
 
+or keep only the last `DAYS` interpolated entries:
+
+```bash
+./valanza.sh weight.txt DAYS
+```
+
 or
 
 ```bash
 ./valanza.rc weight.txt
+```
+
+```bash
+./valanza.rc weight.txt DAYS
 ```
 
 ## How It Works
