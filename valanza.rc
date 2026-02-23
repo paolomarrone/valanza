@@ -1,5 +1,7 @@
 #!/usr/bin/env rc
 
+SCRIPT_DIR = `{dirname `{realpath $0}}
+
 if(~ $#* 0) {
 	echo 'Error: DATA_FILE not provided.'
 	exit 'missing argument'
@@ -9,7 +11,6 @@ DAYS = ''
 if(! ~ $#* 1) {
 	DAYS = $2
 }
-PLOT_FILE = 'plot.gp'
 
 if(! test -f $DATA_FILE) {
 	echo 'Error:' $DATA_FILE 'not found'
@@ -37,16 +38,16 @@ fn cleanup {
 mkfifo $RAM_DIR/^(dates int avg lp1)
 
 cat $DATA_FILE \
-	| ./interpolate_lin.R \
+	| $SCRIPT_DIR^'/interpolate_lin.R' \
 	| {
 		if(! ~ $DAYS '') tail -n $DAYS
 		if(~ $DAYS '') cat
 	  } \
 	| tee \
-		>{cut -d' ' -f1                        > $RAM_DIR/dates} \
-		>{cut -d' ' -f2                        > $RAM_DIR/int} \
-		>{./mov_avg.awk -v 'col=2' -v 'win=11' > $RAM_DIR/avg} \
-		>{./lp1.awk     -v 'col=2'             > $RAM_DIR/lp1} \
+		>{cut -d' ' -f1                                     > $RAM_DIR/dates} \
+		>{cut -d' ' -f2                                     > $RAM_DIR/int}   \
+		>{$SCRIPT_DIR^'/mov_avg.awk' -v 'col=2' -v 'win=11' > $RAM_DIR/avg}   \
+		>{$SCRIPT_DIR^'/lp1.awk'     -v 'col=2'             > $RAM_DIR/lp1}   \
 		> /dev/null &
 
 paste -d ' ' \
@@ -56,6 +57,6 @@ paste -d ' ' \
 	<{cat $RAM_DIR/lp1}   \
 	> $RAM_DIR/all.txt
 
-gnuplot -e 'datafile='''^$RAM_DIR/all.txt^'''' -persist $PLOT_FILE
+gnuplot -e 'datafile='''^$RAM_DIR/all.txt^'''' -persist $SCRIPT_DIR^'/plot.gp'
 
 cleanup
